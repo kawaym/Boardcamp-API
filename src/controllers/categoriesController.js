@@ -11,9 +11,7 @@ export async function readCategories(req, res) {
 
 export async function createCategory(req, res) {
   const categoryName = req.body.name;
-  const categories = await (
-    await connection.query("SELECT * FROM categories")
-  ).rows;
+  const categories = (await connection.query("SELECT * FROM categories")).rows;
 
   if (categoryName.length === 0) {
     res.sendStatus(400);
