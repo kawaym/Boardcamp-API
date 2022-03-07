@@ -51,17 +51,25 @@ export async function readRentals(req, res) {
 export async function createRental(req, res) {
   const gameRented = (
     await connection.query(`
-    SELECT * FROM games
-    WHERE id=${req.body.gameId}
+      SELECT * FROM games
+      WHERE id=${req.body.gameId}
   `)
   ).rows[0];
   const existentConsumer = (
     await connection.query(`
-    SELECT * FROM customers
-    WHERE id=${req.body.customerId}
+      SELECT * FROM customers
+      WHERE id=${req.body.customerId}
     `)
   ).rows[0];
-  if (!existentConsumer || !gameRented) {
+
+  const gameQuantityInStock = gameRented.stockTotal;
+  const gameQuantityRented = await connection.query(`
+    SELECT* FROM rentals
+    WHERE "gameId"=${req.body.gameId}
+    `);
+  const greaterThanStock = !(gameQuantityRented < gameQuantityInStock);
+
+  if (!existentConsumer || !gameRented || greaterThanStock) {
     res.sendStatus(400);
     return;
   }
