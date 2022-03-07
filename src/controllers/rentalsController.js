@@ -64,8 +64,8 @@ export async function createRental(req, res) {
 
   const gameQuantityInStock = gameRented.stockTotal;
   const gameQuantityRented = await connection.query(`
-    SELECT* FROM rentals
-    WHERE "gameId"=${req.body.gameId}
+    SELECT * FROM rentals
+    WHERE "gameId"=${req.body.gameId} AND "returnDate" IS NULL;
     `);
   const greaterThanStock = !(gameQuantityRented < gameQuantityInStock);
 
@@ -152,6 +152,35 @@ export async function updateRental(req, res) {
     res.sendStatus(200);
   } catch (error) {
     console.log(error);
+    res.sendStatus(500);
+  }
+}
+export async function deleteRental(req, res) {
+  const rentalId = req.params.id;
+
+  const rentalInfo = (
+    await connection.query(`
+      SELECT * FROM rentals
+      WHERE id=${rentalId}
+    `)
+  ).rows[0];
+
+  if (!rentalInfo) {
+    res.sendStatus(404);
+    return;
+  }
+  if (rentalInfo.returnDate !== null) {
+    res.sendStatus(400);
+    return;
+  }
+
+  try {
+    await connection.query(`
+      DELETE FROM rentals
+      WHERE id=${rentalId}
+    `);
+    res.sendStatus(200);
+  } catch {
     res.sendStatus(500);
   }
 }
