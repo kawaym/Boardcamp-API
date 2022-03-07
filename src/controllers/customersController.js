@@ -21,3 +21,23 @@ export async function readCustomers(req, res) {
     res.sendStatus(500);
   }
 }
+export async function readCustomerById(req, res) {
+  const id = req.params.id;
+
+  try {
+    const customer = (
+      await connection.query(`
+      SELECT * FROM customers
+      WHERE customers.id=${id}
+    `)
+    ).rows[0];
+    if (customer) {
+      res.send(customer).status(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
