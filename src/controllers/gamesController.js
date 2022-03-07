@@ -15,8 +15,8 @@ export async function readGames(req, res) {
 
   try {
     const games = await connection.query(`
-      SELECT * FROM games 
-      JOIN categories ON games."categoryId" = categories.id    
+      SELECT games.*, categories.name AS "categoryName" from games 
+      JOIN categories ON games."categoryId" = categories.id  
       ${sqlQuery};  
     `);
     res.send(games.rows).status(200);
