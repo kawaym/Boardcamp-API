@@ -12,12 +12,12 @@ export async function readGames(req, res) {
       query.toLowerCase() + "%"
     )}`;
   }
-  console.log(sqlQuery);
 
   try {
     const games = await connection.query(`
-      SELECT * FROM games ${sqlQuery}
-      JOIN categories ON games."categoryId" = categories.id;    
+      SELECT * FROM games 
+      JOIN categories ON games."categoryId" = categories.id    
+      ${sqlQuery};
     `);
     res.send(games.rows).status(200);
   } catch (error) {
