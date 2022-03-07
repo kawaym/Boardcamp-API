@@ -41,3 +41,26 @@ export async function readCustomerById(req, res) {
     res.sendStatus(500);
   }
 }
+export async function createCustomer(req, res) {
+  const customer = req.body;
+
+  const customers = (await connection.query("SELECT * FROM customers")).rows;
+  const existentCpf = customers.filter((c) => c.cpf === customer.cpf);
+  console.log(existentCpf);
+  if (existentCpf.length !== 0) {
+    res.sendStatus(409);
+  } else {
+    try {
+      await connection.query(
+        `
+        INSERT INTO customers (name, "phone", "cpf", "birthday")
+        VALUES ($1, $2, $3, $4)
+        `,
+        [customer.name, customer.phone, customer.cpf, customer.birthday]
+      );
+      res.sendStatus(201);
+    } catch {
+      res.sendStatus(500);
+    }
+  }
+}
