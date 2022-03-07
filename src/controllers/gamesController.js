@@ -17,7 +17,7 @@ export async function readGames(req, res) {
     const games = await connection.query(`
       SELECT * FROM games 
       JOIN categories ON games."categoryId" = categories.id    
-      ${sqlQuery};
+      ${sqlQuery};  
     `);
     res.send(games.rows).status(200);
   } catch (error) {
