@@ -64,3 +64,41 @@ export async function createCustomer(req, res) {
     }
   }
 }
+export async function updateCustomer(req, res) {
+  const customer = req.body;
+  const customerId = req.params.id;
+
+  const customers = (await connection.query("SELECT * FROM customers")).rows;
+  const existentCpf = customers.filter(
+    (c) => c.id !== customerId && c.cpf === customer.cpf
+  );
+
+  if (existentCpf.length !== 0) {
+    res.sendStatus(409);
+  } else {
+    try {
+      await connection.query(
+        `
+        UPDATE customers
+        SET
+          name=$1,
+          phone=$2,
+          cpf=$3,
+          birthday=$4
+        WHERE id=$5
+      `,
+        [
+          customer.name,
+          customer.phone,
+          customer.cpf,
+          customer.birthday,
+          customerId,
+        ]
+      );
+      res.sendStatus(200);
+    } catch (error) {
+      console.log(error);
+      res.sendStatus(500);
+    }
+  }
+}
